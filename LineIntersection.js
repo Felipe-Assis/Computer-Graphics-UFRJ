@@ -42,18 +42,20 @@ function drawPoints(){
 }
 
 function mousePressed(){
-  cursor(CROSS);
   circle = true;
   for (i=0; i<ls.length; i++){
     if (dist(mouseX, mouseY, ls[i][0], ls[i][1]) < 10){
+      cursor(HAND);
       lo = 'start';
       index = i;}
       
     else if (dist(mouseX, mouseY, ls[i][2], ls[i][3]) < 10){
+      cursor(HAND);
       lo = 'end';
       index = i;}}
       
   if (index == null){
+  	cursor(CROSS);
     append(ls,[mouseX, mouseY, mouseX, mouseY]);
     lo = 'end';
     index = ls.length-1;}
