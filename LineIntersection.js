@@ -1,14 +1,16 @@
+//Global variables
 var ls = []; //line segments array
 var points = []; //points array
 var tp = []; //temporary mouse coordinates
-var dragline = false; //indicates line
+var dragline = false; //indicates line dragging
 var index = null; //selected segment index
 var lo = 'start' //line segment orientation
-var circle = false;
+var circle = false; //enables an elipse arround cursor
 var c = [] //background color
+var Graph = [];
 
 function setup() {
-  createCanvas(1000, 500);
+  createCanvas(1240, 555);
 }
 
 function getAngle(a,b){
@@ -16,22 +18,26 @@ function getAngle(a,b){
   return angle;
 }
 
+//Check orientation
 function ccw(a,b,c){
   var res = (b[1] - a[1])*(c[0]-b[0]) - (b[0]-a[0])*(c[1]-b[1]);
   if (res < 0) return -1;
   else if (res > 0) return 1;
   else return 0; }
 
+//Check if collinear
 function collinear(a,b,c){
   return ccw(a,b,c) == 0;
 }
 
+//Verify if line segments intersect
 function verify(a,b,c,d){
   var t1 = ccw(a,c,d)*ccw(b,c,d);
   var t2 = ccw(a,b,c)*ccw(a,b,d);
   return ((t1 <= 0) && (t2 <= 0));
 }
 
+//Calculates intersection points
 function intersection(l1, l2){
   var x1 = l1[0],   y1 = l1[1],   x2 = l1[2],   y2 = l1[3];
   var x3 = l2[0],   y3 = l2[1],   x4 = l2[2],   y4 = l2[3];
@@ -43,15 +49,19 @@ function intersection(l1, l2){
   return [px, py];
 }
 
+//Finds intersection points given line segments
 function findPoints(){
   points = [];
-  for (i=0; i<ls.length; i++){
-    for (j=i+1; j<ls.length; j++){
+  Graph = [];
+  for (var i=0; i<ls.length; i++){
+    linegraph[i] = [];
+    for (var j=i+1; j<ls.length; j++){
       var po = intersection(ls[i],ls[j]);
       if  (po != false){
         append(points, po);}}} 
 }
 
+//Iterates over points array and draw ellipses
 function drawPoints(){
 	fill(255);
 	for (i=0; i<points.length;i++){
@@ -59,26 +69,19 @@ function drawPoints(){
 	}
 }
 
+//Checks point distance to given line
 function pointDist(l, p){
 	res = abs((l[3]-l[1])*p[0] - (l[2]-l[0])*p[1] + l[2]*l[1] - l[3]*l[0]) / sqrt((l[3]-l[1])**2 + (l[2]-l[0])**2);
 	return res;
 }
 
+//Checks point position
 function onSegment(l, p){
 	if ((p[0] >= min(l[0],l[2])) && (p[0] <= max(l[0],l[2])) && (p[1] >= min(l[1],l[3])) && (p[1] <= max(l[1],l[3]))) 
 		return true;
 }
 
-function drawShape(){
-	fill(255);
-	beginShape();
-	for (i=0; i<points.length; i++){
-		vertex(points[i][0],points[i][1]);
-		//print(points[i]);
-	}
-	endShape();
-}
-
+//Draw line segment
 function mousePressed(){
   circle = true;
   for (i=0; i<ls.length; i++){
@@ -108,6 +111,7 @@ function mousePressed(){
     index = ls.length-1;}
 }
 
+//Draw, resize and drag line segment
 function mouseDragged(){
   if (index != null){
     if (lo == 'start'){
@@ -123,22 +127,23 @@ function mouseDragged(){
   	ls[index][3] = (ls[index][3] + (mouseY - tp[1]));
   	tp = [mouseX, mouseY];
   }
-
 }  
 
+//Reset some control variables and change cursor
 function mouseReleased(){
   index = null;
   cursor(ARROW);
   circle = false;
   dragline = false;
-  //print (ls);
 }
 
+//Delete line
 function keyPressed(){
   if (keyCode === (BACKSPACE)){
     ls.splice(ls.length-1, 1);}
 }
 
+//Gets color from HTML sliders
 function getColor(){
   var r = document.getElementById("Red").value;
   var g = document.getElementById("Green").value;
@@ -147,13 +152,13 @@ function getColor(){
   return colorHTML
 }
 
+//Main scene
 function draw() {
   c = getColor();
   background(c[0], c[1], c[2]);
   textSize(12);
   text("Push BACKSPACE to delete last line segment",5,15);
   findPoints();
-  //drawShape();
   for (i=0; i<ls.length; i++){
     line(ls[i][0], ls[i][1], ls[i][2], ls[i][3]);}
   drawPoints();
