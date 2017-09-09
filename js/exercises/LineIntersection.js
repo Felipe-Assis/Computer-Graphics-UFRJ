@@ -10,7 +10,7 @@ var c = [] //background color
 var Graph = [];
 
 function setup() {
-  createCanvas(1240, 555);
+  createCanvas(1366, 610);
 }
 
 function getAngle(a,b){
@@ -54,7 +54,6 @@ function findPoints(){
   points = [];
   Graph = [];
   for (var i=0; i<ls.length; i++){
-    linegraph[i] = [];
     for (var j=i+1; j<ls.length; j++){
       var po = intersection(ls[i],ls[j]);
       if  (po != false){
